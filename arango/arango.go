@@ -52,13 +52,13 @@ func NewArangoConnection(cfg ArangoConfig) (*ArangoConn, error) {
 
 }
 
-func GetAllLSNodes(ctx context.Context, arangoConn *ArangoConn) []LSNode {
+func GetAllLSNodes(ctx context.Context, arangoConn *ArangoConn) []LSNode_Coordinate {
 	queryString := "FOR d in ls_node RETURN d"
 
 	cursor := queryArango(ctx, arangoConn, queryString)
-	var documents []LSNode
+	var documents []LSNode_Coordinate
 	for {
-		var document LSNode
+		var document LSNode_Coordinate
 		doc, err := cursor.ReadDocument(ctx, &document)
 		if !validDocument(doc, err) {
 			break

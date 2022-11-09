@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 	"io/ioutil"
 	"log"
 
@@ -49,11 +50,13 @@ func NewPullCmd() *cobra.Command {
 			// fetch all nodes from arangodb
 			allNodes := arango.GetAllLSNodes(context.TODO(), arangoConn)
 
-			// write all nodes into outpu file
+			// write all nodes into output file
 			err = ioutil.WriteFile(output, utils.ToBytes(allNodes), 0644)
 			if err != nil {
 				log.Fatalf("Error writing output file: %v", err)
 			}
+
+			fmt.Printf("Successfully created output File!\nPlease insert correct coordinates into output file and use the push command\n")
 		},
 	}
 	pullCmd.Flags().StringVar(&output, "o", "coordinates.yaml", "Flag to specify output file")
