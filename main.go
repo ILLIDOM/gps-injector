@@ -1,29 +1,35 @@
 package main
 
 import (
-	"context"
 	"fmt"
-	"log"
+	"os"
+
+	"github.com/ILLIDOM/gps-injector/cmd"
 )
 
 func main() {
-	// Setup Arango Connection
-	arangoConfig := ArangoConfig{
-		URL:      "https://arango.dev.network.garden", // golang http error when port is specified "http: server gave HTTP response to HTTPS client"
-		User:     "root",
-		Password: "jalapeno",
-		Database: "jalapeno",
+	if err := cmd.Execute(); err != nil {
+		fmt.Fprintln(os.Stderr, err.Error())
+		os.Exit(1)
 	}
 
-	arango, err := NewArangoConnection(arangoConfig)
-	if err != nil {
-		log.Fatalf("Failed to create ArangoConnection: %v", err)
-	}
+	// // Setup Arango Connection
+	// arangoConfig := arango.ArangoConfig{
+	// 	URL:      "https://arango.dev.network.garden", // golang http error when port is specified "http: server gave HTTP response to HTTPS client"
+	// 	User:     "root",
+	// 	Password: "jalapeno",
+	// 	Database: "jalapeno",
+	// }
 
-	collectionExists, err := arango.db.CollectionExists(context.TODO(), "ls_node")
-	if err != nil {
-		log.Fatalf("Failed to check collection: %v", err)
-	}
+	// arangoConn, err := arango.NewArangoConnection(arangoConfig)
+	// if err != nil {
+	// 	log.Fatalf("Failed to create ArangoConnection: %v", err)
+	// }
 
-	fmt.Println(collectionExists)
+	// collectionExists, err := arangoConn.db.CollectionExists(context.TODO(), "ls_node")
+	// if err != nil {
+	// 	log.Fatalf("Failed to check collection: %v", err)
+	// }
+
+	// fmt.Println(collectionExists)
 }
