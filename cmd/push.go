@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"strings"
 
 	"github.com/ILLIDOM/gps-injector/arango"
 	"github.com/ILLIDOM/gps-injector/utils"
@@ -39,9 +38,12 @@ func NewPushCmd() *cobra.Command {
 
 			// check if ls_node_coordinates collection exists
 			collectionExists, err := arangoConn.Db.CollectionExists(context.TODO(), "ls_node_coordinates")
-			if err != nil && !strings.Contains(err.Error(), "Unsupported content type 'text/plain; charset=utf-8'") {
+			if err != nil {
 				log.Fatalf("Failed to check collection: %v", err)
 			}
+			// if err != nil && !strings.Contains(err.Error(), "Unsupported content type 'text/plain; charset=utf-8'") {
+			// 	log.Fatalf("Failed to check collection: %v", err)
+			// }
 
 			if collectionExists {
 				log.Printf("Collection ls_node_coordinates already exists\nExiting\n")
