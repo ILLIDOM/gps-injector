@@ -15,8 +15,8 @@ func ToBytes(any interface{}) []byte {
 	return bytes
 }
 
-func ToLSNodeCoordinates(bytes []byte) error {
+func ToLSNodeCoordinates(bytes []byte) []LSNode_Coordinate {
 	var allNodes []LSNode_Coordinate
-	fmt.Println(allNodes)
-	return nil
+	_ = json.Unmarshal(bytes, &allNodes)
+	return allNodes
 }

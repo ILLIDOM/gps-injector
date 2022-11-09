@@ -14,6 +14,7 @@ func New() *cobra.Command {
 
 	rootCmd.AddCommand(
 		NewPullCmd(),
+		NewPushCmd(),
 	)
 
 	return rootCmd

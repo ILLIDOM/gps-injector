@@ -2,10 +2,14 @@ package cmd
 
 import (
 	"context"
+	"io/ioutil"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/ILLIDOM/gps-injector/arango"
+	"github.com/ILLIDOM/gps-injector/utils"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -35,8 +39,8 @@ func NewPushCmd() *cobra.Command {
 
 			// check if ls_node_coordinates collection exists
 			collectionExists, err := arangoConn.Db.CollectionExists(context.TODO(), "ls_node_coordinates")
-			if err != nil {
-				log.Fatalf("Error checking collection: %v", err)
+			if err != nil && !strings.Contains(err.Error(), "Unsupported content type 'text/plain; charset=utf-8'") {
+				log.Fatalf("Failed to check collection: %v", err)
 			}
 
 			if collectionExists {
@@ -44,12 +48,24 @@ func NewPushCmd() *cobra.Command {
 				os.Exit(0)
 			}
 
-			// bytes, err = ioutil.ReadFile(input)
-			// if err != nil {
-			// 	log.Fatalf("Error reading input file: %v", err)
-			// }
+			// create collection
+			col := arango.CreateCollection(arangoConn, "ls_node_coordinates")
 
-			// // allNodes :=
+			bytes, err := ioutil.ReadFile(input)
+			if err != nil {
+				log.Fatalf("Error reading input file: %v", err)
+			}
+
+			allNodes := utils.ToLSNodeCoordinates(bytes)
+			utils.Print(allNodes)
+
+			_, errs, err := col.CreateDocuments(context.TODO(), allNodes)
+			if errs != nil {
+				log.Fatalf("Error writing document errors: %v", errs)
+			}
+			if err != nil {
+				log.Fatalf("Error writing documents: %v", err)
+			}
 
 			// read from input file
 

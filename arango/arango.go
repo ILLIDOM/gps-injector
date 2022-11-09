@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log"
 
+	"github.com/ILLIDOM/gps-injector/utils"
 	"github.com/arangodb/go-driver"
 	"github.com/arangodb/go-driver/http"
 )
@@ -52,13 +53,21 @@ func NewArangoConnection(cfg ArangoConfig) (*ArangoConn, error) {
 
 }
 
-func GetAllLSNodes(ctx context.Context, arangoConn *ArangoConn) []LSNode_Coordinate {
+func CreateCollection(arangoConn *ArangoConn, name string) driver.Collection {
+	col, err := arangoConn.Db.Collection(context.TODO(), name)
+	if err != nil {
+		log.Fatalf("Error creating collection %s: %v", name, err)
+	}
+	return col
+}
+
+func GetAllLSNodes(ctx context.Context, arangoConn *ArangoConn) []utils.LSNode_Coordinate {
 	queryString := "FOR d in ls_node RETURN d"
 
 	cursor := queryArango(ctx, arangoConn, queryString)
-	var documents []LSNode_Coordinate
+	var documents []utils.LSNode_Coordinate
 	for {
-		var document LSNode_Coordinate
+		var document utils.LSNode_Coordinate
 		doc, err := cursor.ReadDocument(ctx, &document)
 		if !validDocument(doc, err) {
 			break

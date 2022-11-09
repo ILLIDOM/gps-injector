@@ -19,10 +19,9 @@ func NewPullCmd() *cobra.Command {
 	pullCmd := &cobra.Command{
 		Use:     "pull",
 		Short:   "get and save yaml for coordinates",
-		Example: "gps-injector pull -o coordinates.yaml",
+		Example: "gps-injector pull -o coordinates.json",
 
 		Run: func(cmd *cobra.Command, args []string) {
-
 			// Create Arango Configuration
 			arangoConfig := arango.ArangoConfig{
 				URL:      viper.GetString("ARANGO_HOST"), // golang http error when port is specified "http: server gave HTTP response to HTTPS client"
@@ -37,7 +36,7 @@ func NewPullCmd() *cobra.Command {
 				log.Fatalf("Failed to create ArangoConnection: %v", err)
 			}
 
-			// check ls_node collection exists
+			// check if ls_node collection exists
 			collectionExists, err := arangoConn.Db.CollectionExists(context.TODO(), "ls_node")
 			if err != nil {
 				log.Fatalf("Failed to check collection: %v", err)
@@ -59,7 +58,7 @@ func NewPullCmd() *cobra.Command {
 			fmt.Printf("Successfully created output File!\nPlease insert correct coordinates into output file and use the push command\n")
 		},
 	}
-	pullCmd.Flags().StringVar(&output, "o", "coordinates.yaml", "Flag to specify output file")
+	pullCmd.Flags().StringVar(&output, "o", "coordinates.json", "Flag to specify output file")
 	pullCmd.MarkFlagRequired("o")
 	return pullCmd
 }
