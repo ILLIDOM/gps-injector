@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 func New() *cobra.Command {
@@ -19,5 +20,7 @@ func New() *cobra.Command {
 }
 
 func Execute() error {
+	viper.SetConfigFile(".env")
+	viper.ReadInConfig()
 	return New().Execute()
 }

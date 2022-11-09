@@ -3,6 +3,7 @@ package arango
 import (
 	"context"
 	"errors"
+	"log"
 
 	"github.com/arangodb/go-driver"
 	"github.com/arangodb/go-driver/http"
@@ -16,7 +17,7 @@ type ArangoConfig struct {
 }
 
 type ArangoConn struct {
-	db driver.Database
+	Db driver.Database
 }
 
 func NewArangoConnection(cfg ArangoConfig) (*ArangoConn, error) {
@@ -46,7 +47,42 @@ func NewArangoConnection(cfg ArangoConfig) (*ArangoConn, error) {
 	}
 
 	return &ArangoConn{
-		db: db,
+		Db: db,
 	}, nil
 
+}
+
+func GetAllLSNodes(ctx context.Context, arangoConn *ArangoConn) []LSNode {
+	queryString := "FOR d in ls_node RETURN d"
+
+	cursor := queryArango(ctx, arangoConn, queryString)
+	var documents []LSNode
+	for {
+		var document LSNode
+		doc, err := cursor.ReadDocument(ctx, &document)
+		if !validDocument(doc, err) {
+			break
+		}
+		documents = append(documents, document)
+	}
+	return documents
+}
+
+func queryArango(ctx context.Context, arangoConn *ArangoConn, queryString string) driver.Cursor {
+	cursor, err := arangoConn.Db.Query(ctx, queryString, nil)
+	if err != nil {
+		log.Fatalf("Error querying arangodb: %v", err)
+	}
+	defer cursor.Close()
+	return cursor
+}
+
+func validDocument(document driver.DocumentMeta, err error) bool {
+	if driver.IsNoMoreDocuments(err) {
+		return false
+	}
+	if err != nil {
+		log.Fatalf("Failed to read from ArangoDb: %v", err)
+	}
+	return true
 }

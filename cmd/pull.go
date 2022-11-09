@@ -1,9 +1,15 @@
 package cmd
 
 import (
-	"fmt"
+	"context"
+	"io/ioutil"
+	"log"
+
+	"github.com/ILLIDOM/gps-injector/arango"
+	"github.com/ILLIDOM/gps-injector/utils"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var output string // flag to specify output file
@@ -15,9 +21,42 @@ func NewPullCmd() *cobra.Command {
 		Example: "gps-injector pull -o coordinates.yaml",
 
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println("Pull command executed")
+
+			// Create Arango Configuration
+			arangoConfig := arango.ArangoConfig{
+				URL:      viper.GetString("ARANGO_HOST"), // golang http error when port is specified "http: server gave HTTP response to HTTPS client"
+				User:     viper.GetString("ARANGO_USER"),
+				Password: viper.GetString("ARANGO_PASSWORD"),
+				Database: viper.GetString("ARANGO_DB"),
+			}
+
+			// create Arango Connection
+			arangoConn, err := arango.NewArangoConnection(arangoConfig)
+			if err != nil {
+				log.Fatalf("Failed to create ArangoConnection: %v", err)
+			}
+
+			// check ls_node collection exists
+			collectionExists, err := arangoConn.Db.CollectionExists(context.TODO(), "ls_node")
+			if err != nil {
+				log.Fatalf("Failed to check collection: %v", err)
+			}
+
+			if !collectionExists {
+				log.Fatalf("ls_node collection does not exist. is Jalapeno up and running?")
+			}
+
+			// fetch all nodes from arangodb
+			allNodes := arango.GetAllLSNodes(context.TODO(), arangoConn)
+
+			// write all nodes into outpu file
+			err = ioutil.WriteFile(output, utils.ToBytes(allNodes), 0644)
+			if err != nil {
+				log.Fatalf("Error writing output file: %v", err)
+			}
 		},
 	}
-	pullCmd.Flags().StringVar(&output, "-o", "coordinates.yaml", "Flag to specify output file")
+	pullCmd.Flags().StringVar(&output, "o", "coordinates.yaml", "Flag to specify output file")
+	pullCmd.MarkFlagRequired("o")
 	return pullCmd
 }
