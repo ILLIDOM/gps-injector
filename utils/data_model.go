@@ -1,4 +1,4 @@
-package arango
+package utils
 
 type LSNode struct {
 	ID  string `json:"_id,omitempty"`
