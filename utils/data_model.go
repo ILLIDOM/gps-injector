@@ -8,6 +8,7 @@ type LSNode struct {
 type LSNode_Coordinate struct {
 	Key       string  `json:"_key,omitempty"`
 	ID        string  `json:"_id,omitempty"`
-	Latitude  float64 // `json:"latitude,omitempty"`
-	Longitude float64 // `json:"longitude,omitempty"`
+	Name      string  `json:"name,omitempty"`
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
 }

@@ -54,7 +54,8 @@ func NewArangoConnection(cfg ArangoConfig) (*ArangoConn, error) {
 }
 
 func CreateCollection(arangoConn *ArangoConn, name string) driver.Collection {
-	col, err := arangoConn.Db.Collection(context.TODO(), name)
+	options := driver.CreateCollectionOptions{}
+	col, err := arangoConn.Db.CreateCollection(context.TODO(), name, &options)
 	if err != nil {
 		log.Fatalf("Error creating collection %s: %v", name, err)
 	}
