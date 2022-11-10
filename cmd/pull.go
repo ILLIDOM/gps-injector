@@ -51,10 +51,13 @@ func NewPullCmd() *cobra.Command {
 			}
 
 			// fetch all nodes from arangodb
-			allNodes := arango.GetAllLSNodes(context.TODO(), arangoConn)
+			nodes := arango.GetAllLSNodes(context.TODO(), arangoConn)
+
+			// set default values for latitude and longitude
+			modifiedNodes := utils.SetDefaultCoordinates(nodes)
 
 			// write all nodes into output file
-			err = ioutil.WriteFile(output, utils.ToBytes(allNodes), 0644)
+			err = ioutil.WriteFile(output, utils.ToBytes(modifiedNodes), 0644)
 			if err != nil {
 				log.Fatalf("Error writing output file: %v", err)
 			}
