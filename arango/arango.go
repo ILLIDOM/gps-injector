@@ -53,6 +53,18 @@ func NewArangoConnection(cfg ArangoConfig) (*ArangoConn, error) {
 
 }
 
+func DeleteCollection(arangoConn *ArangoConn, name string) error {
+	coll, err := arangoConn.Db.Collection(context.TODO(), name)
+	if err != nil {
+		return err
+	}
+	err = coll.Remove(context.TODO())
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func CreateCollection(arangoConn *ArangoConn, name string) driver.Collection {
 	options := driver.CreateCollectionOptions{}
 	col, err := arangoConn.Db.CreateCollection(context.TODO(), name, &options)

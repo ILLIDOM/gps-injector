@@ -15,7 +15,12 @@ import (
 	"github.com/spf13/viper"
 )
 
-var input string // flag to specify input string
+const (
+	COORDINATES_COLLECTION string = "ls_node_coordinates"
+)
+
+var input string   // flag to specify input string
+var overwrite bool // flag to specify if collection shall be overwritten if it already exists
 
 func NewPushCmd() *cobra.Command {
 	pushCmd := &cobra.Command{
@@ -39,19 +44,27 @@ func NewPushCmd() *cobra.Command {
 			}
 
 			// check if ls_node_coordinates collection exists
-			collectionExists, err := arangoConn.Db.CollectionExists(context.TODO(), "ls_node_coordinates")
+			collectionExists, err := arangoConn.Db.CollectionExists(context.TODO(), COORDINATES_COLLECTION)
 			// arangodb returns 404 if collection doesnt exist
 			if err != nil && !strings.Contains(err.Error(), "Unsupported content type 'text/plain; charset=utf-8'") {
 				log.Fatalf("Failed to check collection: %v", err)
 			}
 
-			if collectionExists {
-				log.Printf("Collection ls_node_coordinates already exists\nExiting\n")
+			if collectionExists && !overwrite {
+				log.Printf("Collection %s already exists. --overwrite is false\nExiting\n", COORDINATES_COLLECTION)
 				os.Exit(0)
 			}
 
+			if collectionExists && overwrite {
+				// overwrite collection
+				err := arango.DeleteCollection(arangoConn, COORDINATES_COLLECTION)
+				if err != nil {
+					log.Fatalf("Error removing collection: %v", err)
+				}
+			}
+
 			// create collection
-			col := arango.CreateCollection(arangoConn, "ls_node_coordinates")
+			col := arango.CreateCollection(arangoConn, COORDINATES_COLLECTION)
 
 			// read input file
 			bytes, err := ioutil.ReadFile(input)
@@ -71,10 +84,11 @@ func NewPushCmd() *cobra.Command {
 				log.Fatalf("Error writing documents: %v", err)
 			}
 
-			fmt.Printf("Successfully added ls_node_edge collection!")
+			fmt.Printf("Successfully added %s collection!", COORDINATES_COLLECTION)
 		},
 	}
-	pushCmd.Flags().StringVar(&input, "i", "coordinates.json", "Flag to specify input file")
+	pushCmd.Flags().StringVar(&input, "i", "", "Flag to specify input file")
 	pushCmd.MarkFlagRequired("i")
+	pushCmd.Flags().BoolVar(&overwrite, "overwrite", false, "Flag to specify to overwrite collection")
 	return pushCmd
 }

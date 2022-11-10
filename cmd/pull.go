@@ -13,6 +13,10 @@ import (
 	"github.com/spf13/viper"
 )
 
+const (
+	NODE_COLLECTION string = "ls_node"
+)
+
 var output string // flag to specify output file
 
 func NewPullCmd() *cobra.Command {
@@ -37,13 +41,13 @@ func NewPullCmd() *cobra.Command {
 			}
 
 			// check if ls_node collection exists
-			collectionExists, err := arangoConn.Db.CollectionExists(context.TODO(), "ls_node")
+			collectionExists, err := arangoConn.Db.CollectionExists(context.TODO(), NODE_COLLECTION)
 			if err != nil {
 				log.Fatalf("Failed to check collection: %v", err)
 			}
 
 			if !collectionExists {
-				log.Fatalf("ls_node collection does not exist. is Jalapeno up and running?")
+				log.Fatalf("%s collection does not exist. is Jalapeno up and running?", NODE_COLLECTION)
 			}
 
 			// fetch all nodes from arangodb
