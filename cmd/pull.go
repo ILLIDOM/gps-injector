@@ -62,7 +62,7 @@ func NewPullCmd() *cobra.Command {
 			fmt.Printf("Successfully created output File!\nPlease insert correct coordinates into output file and use the push command\n")
 		},
 	}
-	pullCmd.Flags().StringVar(&output, "o", "coordinates.json", "Flag to specify output file")
-	pullCmd.MarkFlagRequired("o")
+	pullCmd.Flags().StringVarP(&output, "output", "o", "coordinates.json", "Flag to specify output file")
+	pullCmd.MarkFlagRequired("output")
 	return pullCmd
 }

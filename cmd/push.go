@@ -87,8 +87,8 @@ func NewPushCmd() *cobra.Command {
 			fmt.Printf("Successfully added %s collection!", COORDINATES_COLLECTION)
 		},
 	}
-	pushCmd.Flags().StringVar(&input, "i", "", "Flag to specify input file")
-	pushCmd.MarkFlagRequired("i")
-	pushCmd.Flags().BoolVar(&overwrite, "overwrite", false, "Flag to specify to overwrite collection")
+	pushCmd.Flags().StringVarP(&input, "input", "i", "", "Flag to specify input file")
+	pushCmd.MarkFlagRequired("input")
+	pushCmd.Flags().BoolVarP(&overwrite, "overwrite", "o", false, "Flag to specify to overwrite collection")
 	return pushCmd
 }
