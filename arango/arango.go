@@ -74,13 +74,13 @@ func CreateCollection(arangoConn *ArangoConn, name string) driver.Collection {
 	return col
 }
 
-func GetAllLSNodes(ctx context.Context, arangoConn *ArangoConn) []utils.LSNode_Coordinate {
+func GetAllLSNodes(ctx context.Context, arangoConn *ArangoConn) []utils.LSNodeCoordinate {
 	queryString := "FOR d in ls_node RETURN d"
 
 	cursor := queryArango(ctx, arangoConn, queryString)
-	var documents []utils.LSNode_Coordinate
+	var documents []utils.LSNodeCoordinate
 	for {
-		var document utils.LSNode_Coordinate
+		var document utils.LSNodeCoordinate
 		doc, err := cursor.ReadDocument(ctx, &document)
 		if !validDocument(doc, err) {
 			break
