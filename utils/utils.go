@@ -29,7 +29,7 @@ func SetDefaultCoordinates(allNodes []LSNode_Coordinate) []LSNode_Coordinate {
 			LSNode_Coordinate{
 				Key:       v.Key,
 				ID:        v.ID,
-				Name:      v.ID,
+				Name:      v.Name,
 				Latitude:  46.946296718731915,
 				Longitude: 9.033762051602805,
 			})
